@@ -34,6 +34,14 @@ class CellularAutomaton:
 		self.rule = rule
 		if rows % n_cells == 0 and cols % n_cells == 0:
 			self.cell_size = rows // n_cells
+		else: raise Exception("Incorrect number of cells")
+		self.cells = [[Cell(i * n_cells, j * n_cells , self.cell_size) for j in range(n_cells)] for i in range(n_cells)]
+		self.update_cells()
+
+	def update_cells(self):
+		for i in range(self.rows):
+			for j in range(self.cols):
+				self.grid[i][j].containing_cell = self.cells[i // self.cell_size][j // self.cell_size]
 
 	def evolve(self, timestamps):
 		for iteration in range(timestamps):
