@@ -1,3 +1,7 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import animation
+
 
 class Particle:
 	"""
@@ -9,6 +13,9 @@ class Particle:
 		self.containing_cell = None
 
 	def get_value(self):
+		return self.value
+
+	def __str__(self):
 		return self.value
 
 
@@ -30,66 +37,88 @@ class CellularAutomaton:
 	def __init__(self, rows, cols, rule, n_cells):
 		self.rows = rows
 		self.cols = cols
-		self.grid = [[Particle(0) for _ in range(rows)] for _ in range(cols)]
+		self.grid = np.full((1, rows, cols), Particle(0))
 		self.rule = rule
 		if rows % n_cells == 0 and cols % n_cells == 0:
 			self.cell_size = rows // n_cells
-		else: raise Exception("Incorrect number of cells")
-		self.cells = [[Cell(i * n_cells, j * n_cells , self.cell_size) for j in range(n_cells)] for i in range(n_cells)]
+		else:
+			raise Exception("Incorrect number of cells")
+		self.cells = np.array([[Cell(i * n_cells, j * n_cells, self.cell_size) for j in range(n_cells)] for i in range(n_cells)])
 		self.update_cells()
+		self.fig, self.ax = plt.subplots()
+		# self.fig = plt.figure()
+		# self.im = plt.imshow(self.to_array(), cmap="gray")
 
 	def update_cells(self):
 		for i in range(self.rows):
 			for j in range(self.cols):
-				self.grid[i][j].containing_cell = self.cells[i // self.cell_size][j // self.cell_size]
+				self.grid[-1][i][j].containing_cell = self.cells[i // self.cell_size][j // self.cell_size]
 
 	def evolve(self, timestamps):
 		for iteration in range(timestamps):
-			self.convolution(self.rule, iteration)
+			self.grid = np.concatenate((self.grid,
+			                            self.convolution(self.rule, iteration).reshape(1, 20, 20)), axis=0)
 
 	def convolution(self, rule, timestamp):
-		out_grid = self.grid
+		out_grid = np.full_like(self.grid[-1], Particle(0))
 		kernel_size = 3
-		for r in range(kernel_size//2, self.rows - kernel_size//2):
-			for c in range(kernel_size//2, self.cols - kernel_size//2):
-				i, j = 0, 0
-				neighbourhood = [[Particle(0) for _ in range(kernel_size)] for _ in range(kernel_size)]
-				for x in range(r - kernel_size//2, r + kernel_size//2 + 1):
-					for y in range(c - kernel_size // 2, c + kernel_size // 2 + 1):
-						neighbourhood[i][j] = self.grid[x][y]
-						i += 1
-					j += 1
-					i = 0
-
-				new_cell_value = rule(neighbourhood, self.grid[r][c], timestamp)
+		kernel_radius = kernel_size//2
+		for r in range(kernel_radius, self.rows - kernel_radius):
+			for c in range(kernel_radius, self.cols - kernel_radius):
+				neighbourhood = \
+					self.grid[-1, r - kernel_radius:r + kernel_radius + 1, c - kernel_radius: c + kernel_radius + 1]
+				new_cell_value = rule(neighbourhood, timestamp)
 				if new_cell_value is not None:
-					out_grid[r][c] = new_cell_value
-		self.grid = out_grid
+					out_grid[r, c] = new_cell_value
+		return out_grid
 
 	def draw_initial_state(self, indices):
 		for r, c in indices:
-			self.grid[r][c] = Particle(1)
+			self.grid[0, r, c] = Particle(1)
 
-	def to_array(self):
-		return [[p.value for p in row] for row in self.grid]
+	def to_array(self, index=-1):
+		return [[p.value for p in row] for row in self.grid[index]]
 
 	def __str__(self):
-		return '\n'.join([' | '.join([str(cell.value) for cell in row]) for row in self.grid])
+		return '\n'.join([' | '.join([str(particle.value) for particle in row]) for row in self.grid[-1]])
+
+	def plot(self):
+		plt.imshow(self.to_array(), cmap="gray")
+		plt.show()
+
+	def animation_init(self):
+		self.ax.imshow(self.to_array(0), cmap="gray")
+		return (self.ax,)
+
+	def update_frame(self, i):
+		self.ax.imshow(self.to_array(i), cmap="gray")
+		return (self.ax,)
+
+	def plot_animate(self):
+		anim = animation.FuncAnimation(self.fig, self.update_frame, init_func=self.animation_init,
+		                               frames=self.grid.shape[0])
+		plt.show()
 
 
-def oil_spill_rule(neighbourhood, c: Particle, timestamp):
+def oil_spill_rule(neighbourhood, timestamp):
 	# TODO: implement real spread rules, for now it's game of life
-	center_cell_val = neighbourhood[1][1].get_value()
+	kernel_size = neighbourhood.shape[0]
+	center_cell_val = neighbourhood[kernel_size//2][kernel_size//2].get_value()
 	total = 0
 	for row in neighbourhood:
-		for cell in row:
-			total += cell.get_value()
+		for particle in row:
+			total += particle.get_value()
+
 	if center_cell_val == 1:
-		if (total < 2) or (total > 3):
+		if 3 <= total <= 4:
+			return Particle(1)
+		else:
 			return Particle(0)
 	else:
 		if total == 3:
 			return Particle(1)
+		else:
+			return Particle(0)
 
 
 
