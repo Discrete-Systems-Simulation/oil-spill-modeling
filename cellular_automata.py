@@ -8,8 +8,9 @@ class Particle:
 	Represents a single oil particle in cellular automaton
 	TODO: add all necessary variables, transformations and functions consistent with mathematical model
 	"""
-	def __init__(self, value=0):
+	def __init__(self, value=0, mass=5):
 		self.value = value
+		self.mass = mass
 		self.containing_cell = None
 
 	def get_value(self):
@@ -24,10 +25,11 @@ class Cell:
 	Cell containing oil particles, represents constitutes the physical space (eg. sea, coast)
 	TODO: add all necessary variables such as CEVs and CIVs consistent with mathematical model
 	"""
-	def __init__(self, x, y, size):
+	def __init__(self, x, y, size, particles_inside=None):
 		self.size = size
 		self.x = x
 		self.y = y
+		self.particles = np.array(particles_inside)
 
 
 class CellularAutomaton:
@@ -43,21 +45,27 @@ class CellularAutomaton:
 			self.cell_size = rows // n_cells
 		else:
 			raise Exception("Incorrect number of cells")
-		self.cells = np.array([[Cell(i * n_cells, j * n_cells, self.cell_size) for j in range(n_cells)] for i in range(n_cells)])
+		self.cells = np.array([[Cell(i * self.cell_size, j * self.cell_size, self.cell_size) for j in range(n_cells)] for i in range(n_cells)])
 		self.update_cells()
 		self.fig, self.ax = plt.subplots()
-		# self.fig = plt.figure()
-		# self.im = plt.imshow(self.to_array(), cmap="gray")
+		self.ax.set_xticks([x for x in range(0, self.cols, self.cell_size)])
+		self.ax.set_yticks([x for x in range(0, self.rows, self.cell_size)])
+		self.ax.grid(color='w', linewidth=1)
 
 	def update_cells(self):
 		for i in range(self.rows):
 			for j in range(self.cols):
-				self.grid[-1][i][j].containing_cell = self.cells[i // self.cell_size][j // self.cell_size]
+				self.grid[-1][i][j].containing_cell = self.cells[(i // self.cell_size)][(j // self.cell_size)]
+		for row in self.cells:
+			for cell in row:
+				cell.particles = [[self.grid[-1, x, y] for y in range(cell.y, cell.y + self.cell_size)]
+				                  for x in range(cell.x, cell.x + self.cell_size)]
 
 	def evolve(self, timestamps):
 		for iteration in range(timestamps):
 			self.grid = np.concatenate((self.grid,
-			                            self.convolution(self.rule, iteration).reshape(1, 20, 20)), axis=0)
+			                            self.convolution(self.rule, iteration).reshape(1, self.rows, self.cols)), axis=0)
+			self.update_cells()
 
 	def convolution(self, rule, timestamp):
 		out_grid = np.full_like(self.grid[-1], Particle(0))
@@ -75,6 +83,7 @@ class CellularAutomaton:
 	def draw_initial_state(self, indices):
 		for r, c in indices:
 			self.grid[0, r, c] = Particle(1)
+		self.update_cells()
 
 	def to_array(self, index=-1):
 		return [[p.value for p in row] for row in self.grid[index]]
@@ -83,15 +92,15 @@ class CellularAutomaton:
 		return '\n'.join([' | '.join([str(particle.value) for particle in row]) for row in self.grid[-1]])
 
 	def plot(self):
-		plt.imshow(self.to_array(), cmap="gray")
+		self.ax.imshow(self.to_array(), cmap="gray", extent=(0, self.rows, self.cols, 0))
 		plt.show()
 
 	def animation_init(self):
-		self.ax.imshow(self.to_array(0), cmap="gray")
+		self.ax.imshow(self.to_array(0), cmap="gray", extent=(0, self.rows, self.cols, 0))
 		return (self.ax,)
 
 	def update_frame(self, i):
-		self.ax.imshow(self.to_array(i), cmap="gray")
+		self.ax.imshow(self.to_array(i), cmap="gray", extent=(0, self.rows, self.cols, 0))
 		return (self.ax,)
 
 	def plot_animate(self):
