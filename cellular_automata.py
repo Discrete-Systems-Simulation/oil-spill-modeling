@@ -42,6 +42,7 @@ class CellularAutomaton:
 	"""
 	Simulation board, contains Particle objects and Cells
 	"""
+
 	def __init__(self, rows, cols, rule, n_cells):
 		self.rows = rows
 		self.cols = cols
@@ -109,10 +110,11 @@ class CellularAutomaton:
 		self.ax.imshow(self.to_array(i), cmap="gray", extent=(0, self.rows, self.cols, 0))
 		return (self.ax,)
 
-	def plot_animate(self):
-		anim = animation.FuncAnimation(self.fig, self.update_frame, init_func=self.animation_init,
+	def plot_animate(self, filename):
+		ani = animation.FuncAnimation(self.fig, self.update_frame, init_func=self.animation_init,
 		                               frames=self.grid.shape[0])
-		plt.show()
+		writer = animation.PillowWriter(fps=15)
+		ani.save(filename, writer=writer)
 
 
 def oil_spill_rule(neighbourhood, timestamp):
@@ -134,6 +136,3 @@ def oil_spill_rule(neighbourhood, timestamp):
 			return Particle(1)
 		else:
 			return Particle(0)
-
-
-
