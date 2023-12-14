@@ -31,6 +31,12 @@ class Cell:
 		self.y = y
 		self.particles = np.array(particles_inside)
 
+	def oil_mass(self):
+		mass = 0
+		for particle in self.particles.flatten():
+			mass += particle.mass
+		return mass
+
 
 class CellularAutomaton:
 	"""
