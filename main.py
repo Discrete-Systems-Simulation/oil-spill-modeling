@@ -1,8 +1,11 @@
 import src.CellularAutomaton as ca
+from src.Config import Config
 import os
 
 
 if __name__ == '__main__':
+	config = Config("config.cfg")
+	print(config.params)
 	# our implementation
 	cellular_automaton = ca.CellularAutomaton(20, 20, ca.game_of_life_rule, 4)
 	cellular_automaton.draw_initial_state([(8, 10), (9, 11), (10, 9), (10, 11), (10, 10)])

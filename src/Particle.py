@@ -1,6 +1,3 @@
-from src.Cell import Cell
-
-
 class Particle:
     """
     Represents a single oil particle in cellular automaton
