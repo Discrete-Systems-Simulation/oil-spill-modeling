@@ -51,7 +51,7 @@ class CellularAutomaton:
                                         self.convolution(self.rule, iteration).reshape(1, self.x_size, self.y_size)), axis=0)
             self.update_cells()
 
-    def convolution(self, rule: Callable[[np.ndarray, int], Particle], timestamp: int) -> np.ndarray():
+    def convolution(self, rule: Callable[[np.ndarray, int], Particle], timestamp: int) -> np.ndarray:
         out_grid = np.full_like(self.grid[-1], Particle(0))
         kernel_size = 3
         kernel_radius = kernel_size//2
@@ -70,24 +70,27 @@ class CellularAutomaton:
             self.grid[0, r, c] = Particle(1)
         self.update_cells()
 
-    def to_array(self, index: int = -1) -> List[List[int]]:
-        return [[p.value for p in row] for row in self.grid[index]]
+    def to_array(self, index=-1) -> List[List[Particle]]:
+        return self.grid[index].tolist()
+
+    def get_all_masses(self, index=-1) -> List[List[int]]:
+        return [[particle.mass for particle in row] for row in self.grid[index]]
 
     def __str__(self):
-        return '\n'.join([' | '.join([str(particle.value) for particle in row]) for row in self.grid[-1]])
+        return '\n'.join([' | '.join([str(particle.mass) for particle in row]) for row in self.grid[-1]])
 
     def plot(self):
-        self.ax.imshow(self.to_array(), cmap="gray",
+        self.ax.imshow(self.get_all_masses(), cmap="gray",
                        extent=(0, self.x_size, self.y_size, 0))
         plt.show()
 
     def animation_init(self) -> Tuple:
-        self.ax.imshow(self.to_array(0), cmap="gray",
+        self.ax.imshow(self.get_all_masses(0), cmap="gray",
                        extent=(0, self.x_size, self.y_size, 0))
         return (self.ax,)
 
     def update_frame(self, i: int) -> Tuple:
-        self.ax.imshow(self.to_array(i), cmap="gray",
+        self.ax.imshow(self.get_all_masses(i), cmap="gray",
                        extent=(0, self.x_size, self.y_size, 0))
         return (self.ax,)
 
@@ -98,18 +101,18 @@ class CellularAutomaton:
         ani.save(filename, writer=writer)
 
 
-def oil_spill_rule(neighbourhood: np.ndarray, timestamp) -> Particle:
+def oil_spill_rule(neighbourhood: np.ndarray, timestamp: int) -> Particle:
     # TODO: implement real spread rules
     pass
 
 
 def game_of_life_rule(neighbourhood: np.ndarray, timestamp: int) -> Particle:
     kernel_size = neighbourhood.shape[0]
-    center_cell_val = neighbourhood[kernel_size//2][kernel_size//2].get_value()
+    center_cell_val = neighbourhood[kernel_size//2][kernel_size//2].get_mass()
     total = 0
     for row in neighbourhood:
         for particle in row:
-            total += particle.get_value()
+            total += particle.get_mass()
 
     if center_cell_val == 1:
         if 3 <= total <= 4:
