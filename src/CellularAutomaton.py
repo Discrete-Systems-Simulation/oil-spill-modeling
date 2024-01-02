@@ -13,8 +13,9 @@ class CellularAutomaton:
     """
     x_size: int
     y_size: int
-    grid: np.ndarray  # 3-dim: [frame, row_idx, col_idx] -> Particle
-    # (neighbourhood, timestamp) -> updated Particle
+    # 3-dim: [frame, row_idx, col_idx] -> Particle, TODO: convert to Cell
+    grid: np.ndarray
+    # (neighbourhood, timestamp) -> updated Particle, TODO: convert to Cells
     _rule: Callable[[np.ndarray, int], Particle]
     n_cells: int
     _cells: np.ndarray
@@ -104,7 +105,7 @@ class CellularAutomaton:
         ani.save(filename, writer=writer)
 
 
-def oil_spill_rule(neighbourhood: np.ndarray, timestamp: int) -> Particle:
+def oil_spill_rule(neighbourhood: np.ndarray, timestamp: int) -> Cell:
     kernel_size = neighbourhood.shape[0]
     cell = neighbourhood[kernel_size//2][kernel_size//2].get_mass()
     # TODO: implement real spread rules
