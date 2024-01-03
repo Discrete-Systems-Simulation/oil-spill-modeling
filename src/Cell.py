@@ -1,5 +1,6 @@
-import numpy as np
 from dataclasses import dataclass
+from typing import List
+from src.Particle import Particle
 
 
 @dataclass
@@ -28,18 +29,15 @@ class Cell:
     y: int
     civ: CellInternalVariables
     cev: CellExternalVariables
-    particles_inside: np.ndarray
+    particles: List[Particle]
 
-    def __init__(self, x: int, y: int, size: int, civ=CellInternalVariables(), cev=CellExternalVariables(), particles_inside=np.array([])):
+    def __init__(self, x: int, y: int, size: int, civ=CellInternalVariables(), cev=CellExternalVariables(), particles=[]):
         self.size = size
         self.x = x
         self.y = y
-        self.particles = np.array(particles_inside)
+        self.particles = particles
         self.civ = civ
         self.cev = cev
 
-    def oil_mass(self) -> int:
-        mass = 0
-        for particle in self.particles.flatten():
-            mass += particle.mass
-        return mass
+    def get_oil_mass(self) -> int:
+        return sum([particle.mass for particle in self.particles])
