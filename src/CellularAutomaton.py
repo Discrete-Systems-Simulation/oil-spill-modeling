@@ -21,8 +21,9 @@ class CellularAutomaton:
     _cells: np.ndarray
     _fig: plt.Figure
     _ax: any
+    timestamp: int
 
-    def __init__(self, rows: int, cols: int, rule: Callable[[np.ndarray, int], Particle], n_cells: int):
+    def __init__(self, rows: int, cols: int, rule: Callable[[np.ndarray, int], Particle], n_cells: int, timestamp: int):
         self.x_size = rows
         self.y_size = cols
         self.grid = np.full((1, rows, cols), Particle(0))
@@ -38,6 +39,7 @@ class CellularAutomaton:
         self._ax.set_xticks([x for x in range(0, self.y_size, self.cell_size)])
         self._ax.set_yticks([x for x in range(0, self.x_size, self.cell_size)])
         self._ax.grid(color='w', linewidth=1)
+        self.timestamp = timestamp
 
     def update_cells(self):
         for i in range(self.x_size):
@@ -109,7 +111,7 @@ def oil_spill_rule(neighbourhood: np.ndarray, timestamp: int) -> Cell:
     kernel_size = neighbourhood.shape[0]
     cell = neighbourhood[kernel_size//2][kernel_size//2].get_mass()
     # TODO: implement real spread rules
-    cell = Advection.apply(cell)
+    cell = Advection.apply(cell, timestamp)
     # etc...
 
     return cell
