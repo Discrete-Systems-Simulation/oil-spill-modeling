@@ -1,3 +1,5 @@
+import math
+
 from src.Cell import Cell
 
 
@@ -14,11 +16,18 @@ class Advection:
             particle.y += y_change
         return cell
 
-class Spreading:
+class Interaction:
 
     @classmethod
-    def apply(cls, cell: Cell):
-        # TODO
+    def apply(cls, cell: Cell, timestamp: int, board_x: int, board_y: int):
+        t1_2 = 100
+        if cell.cev.is_land :
+            for particle in cell.particles_inside:
+                m_change = math.log(2, math.e) / t1_2 * particle.mass * timestamp
+                # TODO check if mass > than minimum
+        #         TODO add particle to next cell ( which is not a land )
+
+
         return cell
 
 # etc...
