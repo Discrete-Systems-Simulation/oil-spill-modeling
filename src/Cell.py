@@ -13,7 +13,7 @@ class CellExternalVariables:
     wind_speed_horizontal: int = 0  # + -> right (units/step)
     wind_speed_vertical: int = 0  # + -> down (units/step)
     sea_current_speed_horizontal: int = 0  # + -> right (units/step)
-    sea_current_speed_vertical: int = 0  # + -> right (units/step)
+    sea_current_speed_vertical: int = 0  # + -> down (units/step)
     temperature: float = 15 + 273.15  # Kelwins
     is_land: bool = False
 
