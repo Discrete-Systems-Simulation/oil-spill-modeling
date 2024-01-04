@@ -42,7 +42,7 @@ class CellularAutomaton:
 
     def evolve(self, timestamps: int):
         for iteration in range(timestamps):
-            print("Iteration: ", iteration)
+            print("Iteration:", iteration + 1)
             self._cells = np.concatenate((self._cells, self.convolution(
                 self._rule, iteration).reshape(1, self._cells_grid_size, self._cells_grid_size)), axis=0)
 

@@ -20,7 +20,12 @@ def game_of_life_test():
 
 
 def oil_spill_test():
-    cellular_automaton = ca.CellularAutomaton(1000, 1000, ca.oil_spill_rule, 10)
+    cellular_automaton = ca.CellularAutomaton(
+        config.params["particles_grid_size"],
+        config.params["particles_grid_size"],
+        ca.oil_spill_rule,
+        config.params["cells_grid_size"]
+    )
     # plt.figure()
     # plt.imshow(np.array([[1 if (r, c) in config.data["initial_state"] else 0 for c in range(1000)] for r in range(1000)]), 'gray')
     # plt.show()
@@ -30,6 +35,5 @@ def oil_spill_test():
 
 
 if __name__ == '__main__':
-    print(config.params)
     # game_of_life_test()
     oil_spill_test()
