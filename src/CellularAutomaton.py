@@ -1,9 +1,11 @@
+import sys
+
 from PIL import Image
 from src.Particle import Particle
 from src.Cell import Cell
 from matplotlib import animation
 from typing import Callable, List, Tuple
-from src.events import *
+from src.Events import *
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -23,10 +25,10 @@ class CellularAutomaton:
     _fig: plt.Figure
     _ax: any
 
-    def __init__(self, rows: int, cols: int, rule: Callable[[np.ndarray, int], Cell], cells_grid_size: int):
+    def __init__(self, rows: int, cols: int, cells_grid_size: int):
         self.rows = rows
         self.cols = cols
-        self._rule = rule
+        # self._rule = rule
         if rows % cells_grid_size == 0 and cols % cells_grid_size == 0:
             self._cell_size = rows // cells_grid_size
         else:
@@ -42,22 +44,29 @@ class CellularAutomaton:
 
     def evolve(self, timestamps: int):
         for iteration in range(timestamps):
+            for i in range(1000):
+                for j in range(1000):
+                    if (i - 480) ** 2 + (j - 480) ** 2 <= 20 ** 2:
+                        self._cells[iteration, 4, 4].add_particle(Particle(i, j))
             print("Iteration:", iteration + 1)
-            self._cells = np.concatenate((self._cells, self.convolution(
-                self._rule, iteration).reshape(1, self._cells_grid_size, self._cells_grid_size)), axis=0)
+            self._cells = np.concatenate((self._cells, self.convolution(iteration).reshape(1, self._cells_grid_size, self._cells_grid_size)), axis=0)
 
-    def convolution(self, rule: Callable[[np.ndarray, int], Particle], timestamp: int) -> np.ndarray:
+    def convolution(self, timestamp: int) -> np.ndarray:
         new_frame = self._cells[-1].copy()
         kernel_size = 3
         kernel_radius = kernel_size//2
         for r in range(kernel_radius, self._cells_grid_size - kernel_radius):
             for c in range(kernel_radius, self._cells_grid_size - kernel_radius):
-                neighbourhood = \
-                    self._cells[-1, r - kernel_radius:r + kernel_radius +
-                                1, c - kernel_radius: c + kernel_radius + 1]
-                new_cell = rule(neighbourhood, timestamp)
-                if new_cell is not None:
-                    new_frame[r, c] = new_cell
+                for rule in ['Advection', 'Spreading']:
+                    neighbourhood = \
+                        self._cells[-1, r - kernel_radius:r + kernel_radius +
+                                    1, c - kernel_radius: c + kernel_radius + 1]
+                    # new_cell = rule(neighbourhood, timestamp)
+                    new_cell = getattr(sys.modules[__name__], rule).apply(neighbourhood)
+                    # new_cell = Advection.apply(neighbourhood)
+
+                    if new_cell is not None:
+                        new_frame[r, c] = new_cell
 
         return new_frame
 
@@ -108,12 +117,12 @@ class CellularAutomaton:
         ani.save(filename, writer=writer)
 
 
-def oil_spill_rule(neighbourhood: np.ndarray, timestamp: int) -> Cell:
-    # TODO: implement real spread rules
-    cell = Advection.apply(neighbourhood)
-    # etc...
-
-    return cell
+# def oil_spill_rule(neighbourhood: np.ndarray, timestamp: int) -> Cell:
+#     # TODO: implement real spread rules
+#
+#     # etc...
+#
+#     return cell
 
 
 def game_of_life_rule(neighbourhood: np.ndarray, timestamp: int) -> Particle:

@@ -10,7 +10,7 @@ class Particle:
     _x: int  # column number
     mass: int
 
-    def __init__(self, y: Union[int, float], x: Union[int, float], mass=1.0):
+    def __init__(self, y: Union[int, float], x: Union[int, float], mass=5.0):
         self._y = round(y)
         self._x = round(x)
         self.mass = mass
