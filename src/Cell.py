@@ -10,7 +10,7 @@ class CellInternalVariables:
 
 
 @dataclass
-class CellExternalVariables: # To read from config()
+class CellExternalVariables:  # To read from config()
     wind_speed_horizontal: int = 20  # + -> right (m/s)
     wind_speed_vertical: int = 0  # + -> down (m/s)
     sea_current_speed_horizontal: int = 0  # + -> right (m/s)
@@ -25,8 +25,8 @@ class Cell:
     TODO: add all necessary variables such as CEVs and CIVs consistent with mathematical model
     """
     size: int
-    y: int # row number
-    x: int # column number
+    y: int  # row number
+    x: int  # column number
     civ: CellInternalVariables
     cev: CellExternalVariables
     particles: List[Particle]
@@ -41,5 +41,11 @@ class Cell:
 
     def get_oil_mass(self) -> int:
         return sum([particle.mass for particle in self.particles])
-    
-    #TODO: function to merge particles at the same place
+
+    def add_particle(self, new_particle: Particle):
+        for op in self.particles:
+            if op.get_x() == new_particle.get_x() and op.get_y() == new_particle.get_y():
+                op.mass += new_particle.mass
+                return
+
+        self.particles.append(new_particle)

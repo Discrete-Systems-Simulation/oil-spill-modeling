@@ -54,9 +54,8 @@ class Advection:
         for row in new_neighbourhood:
             for cell in row:
                 for particle in cell.particles:
-                    if cell != center_cell:
-                        if particle.get_x() >= left and particle.get_x() < right and particle.get_y() >= up and particle.get_y() < down:
-                            center_cell.particles.append(particle)
+                    if cell != center_cell and particle.get_x() >= left and particle.get_x() < right and particle.get_y() >= up and particle.get_y() < down:
+                        center_cell.add_particle(particle)
 
     @classmethod
     def _remove_outer_particles(cls, center_cell, left, up, right, down):

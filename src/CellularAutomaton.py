@@ -64,7 +64,7 @@ class CellularAutomaton:
     def draw_initial_state(self, indices: List[Tuple[int, int]]):
         for r, c in indices:
             self._cells[0, r//self._cell_size, c //
-                        self._cell_size].particles.append(Particle(r, c))
+                        self._cell_size].add_particle(Particle(r, c))
 
     def get_all_masses(self, index=-1) -> List[List[int]]:
         oil_masses = np.zeros((self.rows, self.cols), dtype=float)
