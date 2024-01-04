@@ -1,3 +1,4 @@
+from PIL import Image
 from src.Particle import Particle
 from src.Cell import Cell
 from matplotlib import animation
@@ -86,14 +87,18 @@ class CellularAutomaton:
         plt.show()
 
     def animation_init(self) -> Tuple:
-        self._ax.imshow(self.get_all_masses(0), cmap="gray",
+        im = np.array(Image.open('out/img/map.png'))
+        self._ax.imshow(im)
+        self._ax.imshow(self.get_all_masses(0), cmap="binary", alpha=0.3,
                         extent=(0, self.rows, self.cols, 0))
-        return (self._ax,)
+        return self._ax,
 
     def update_frame(self, i: int) -> Tuple:
-        self._ax.imshow(self.get_all_masses(i), cmap="gray",
+        im = np.array(Image.open('out/img/map.png'))
+        self._ax.imshow(im)
+        self._ax.imshow(self.get_all_masses(i), cmap="binary", alpha=0.3,
                         extent=(0, self.rows, self.cols, 0))
-        return (self._ax,)
+        return self._ax,
 
     def plot_animate(self, filename: str):
         print("Animating...")
