@@ -10,11 +10,11 @@ class CellInternalVariables:
 
 
 @dataclass
-class CellExternalVariables:
-    wind_speed_horizontal: int = 0  # + -> right (units/step)
+class CellExternalVariables: # To read from config()
+    wind_speed_horizontal: int = 100  # + -> right (units/step)
     wind_speed_vertical: int = 0  # + -> down (units/step)
     sea_current_speed_horizontal: int = 0  # + -> right (units/step)
-    sea_current_speed_vertical: int = 0  # + -> down (units/step)
+    sea_current_speed_vertical: int = 10  # + -> down (units/step)
     temperature: float = 15 + 273.15  # Kelwins
     is_land: bool = False
 
@@ -35,7 +35,7 @@ class Cell:
         self.size = size
         self.x = x
         self.y = y
-        self.particles = particles
+        self.particles = particles.copy()
         self.civ = civ
         self.cev = cev
 
