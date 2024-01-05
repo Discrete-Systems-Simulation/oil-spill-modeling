@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List
 from src.Particle import Particle
-
+import copy
 
 @dataclass
 class CellInternalVariables:
@@ -11,10 +11,10 @@ class CellInternalVariables:
 
 @dataclass
 class CellExternalVariables:  # To read from config()
-    wind_speed_horizontal: int = 20  # + -> right (m/s)
-    wind_speed_vertical: int = 0  # + -> down (m/s)
-    sea_current_speed_horizontal: int = 0  # + -> right (m/s)
-    sea_current_speed_vertical: int = -1  # + -> down (m/s)
+    wind_speed_horizontal: int = 0  # + -> right (m/s)
+    wind_speed_vertical: int = -20  # + -> down (m/s)
+    sea_current_speed_horizontal: int = 1  # + -> right (m/s)
+    sea_current_speed_vertical: int = 0  # + -> down (m/s)
     temperature: float = 15 + 273.15  # Kelwins
     is_land: bool = False
 
@@ -36,8 +36,8 @@ class Cell:
         self.y = y
         self.x = x
         self.particles = particles.copy()
-        self.civ = civ
-        self.cev = cev
+        self.civ = copy.deepcopy(civ)
+        self.cev = copy.deepcopy(cev)
 
     def get_oil_mass(self) -> int:
         return sum([particle.mass for particle in self.particles])
@@ -45,7 +45,7 @@ class Cell:
     def add_particle(self, new_particle: Particle):
         for op in self.particles:
             if op.get_x() == new_particle.get_x() and op.get_y() == new_particle.get_y():
-                op.mass += new_particle.mass
+                # op.mass += new_particle.mass
                 return
 
         self.particles.append(new_particle)
