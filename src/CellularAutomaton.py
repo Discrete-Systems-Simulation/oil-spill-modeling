@@ -16,8 +16,6 @@ class CellularAutomaton:
     """
     rows: int
     cols: int
-    # (neighbourhood, timestamp) -> updated Cell
-    _rule: Callable[[np.ndarray, int], Cell]
     # 3-dim: [frame, row_idx, col_idx] -> Cell
     _cells: np.ndarray
     _cell_size: int
@@ -52,14 +50,16 @@ class CellularAutomaton:
         self._cells[0, 4, 7].cev.sea_current_speed_vertical = 0.6
         #
         for iteration in range(timestamps):
-            for i in range(1000):
-                for j in range(1000):
+            for i in range(460, 500):
+                for j in range(460, 500):
                     if (i - 480) ** 2 + (j - 480) ** 2 <= 20 ** 2:
-                        self._cells[iteration, 4, 4].add_particle(Particle(i, j))
+                        self._cells[iteration, 4, 4].add_particle(
+                            Particle(i, j))
             print("Iteration:", iteration + 1)
-            self._cells = np.concatenate((self._cells, self.convolution(iteration).reshape(1, self._cells_grid_size, self._cells_grid_size)), axis=0)
+            self._cells = np.concatenate((self._cells, self.convolution().reshape(
+                1, self._cells_grid_size, self._cells_grid_size)), axis=0)
 
-    def convolution(self, timestamp: int) -> np.ndarray:
+    def convolution(self) -> np.ndarray:
         new_frame = self._cells[-1].copy()
         kernel_size = 3
         kernel_radius = kernel_size//2
@@ -69,10 +69,8 @@ class CellularAutomaton:
                     neighbourhood = \
                         self._cells[-1, r - kernel_radius:r + kernel_radius +
                                     1, c - kernel_radius: c + kernel_radius + 1]
-                    # new_cell = rule(neighbourhood, timestamp)
-                    new_cell = getattr(sys.modules[__name__], rule).apply(neighbourhood)
-                    # new_cell = Advection.apply(neighbourhood)
-
+                    new_cell = getattr(sys.modules[__name__], rule)\
+                        .apply(neighbourhood)
                     if new_cell is not None:
                         new_frame[r, c] = new_cell
 
@@ -95,22 +93,13 @@ class CellularAutomaton:
 
         return oil_masses
 
-    # def __str__(self):
-    #     return '\n'.join([' | '.join([str(particle.mass) for particle in row]) for row in self.grid[-1]])
-
     def plot(self):
         self._ax.imshow(self.get_all_masses(), cmap="gray",
                         extent=(0, self.rows, self.cols, 0))
         plt.show()
 
-    def animation_init(self) -> Tuple:
-        im = np.array(Image.open('out/img/map.png'))
-        self._ax.imshow(im)
-        self._ax.imshow(self.get_all_masses(0), cmap="binary", alpha=0.3,
-                        extent=(0, self.rows, self.cols, 0))
-        return self._ax,
-
     def update_frame(self, i: int) -> Tuple:
+        print("Frame:", i)
         im = np.array(Image.open('out/img/map.png'))
         self._ax.imshow(im)
         self._ax.imshow(self.get_all_masses(i), cmap="binary", alpha=0.3,
@@ -119,35 +108,7 @@ class CellularAutomaton:
 
     def plot_animate(self, filename: str):
         print("Animating...")
-        ani = animation.FuncAnimation(self._fig, self.update_frame, init_func=self.animation_init,
-                                      frames=self._cells.shape[0])
+        ani = animation.FuncAnimation(
+            self._fig, self.update_frame, frames=self._cells.shape[0])
         writer = animation.PillowWriter(fps=7)
         ani.save(filename, writer=writer)
-
-
-# def oil_spill_rule(neighbourhood: np.ndarray, timestamp: int) -> Cell:
-#     # TODO: implement real spread rules
-#
-#     # etc...
-#
-#     return cell
-
-
-def game_of_life_rule(neighbourhood: np.ndarray, timestamp: int) -> Particle:
-    kernel_size = neighbourhood.shape[0]
-    center_cell_val = neighbourhood[kernel_size//2][kernel_size//2].get_mass()
-    total = 0
-    for row in neighbourhood:
-        for particle in row:
-            total += particle.get_mass()
-
-    if center_cell_val == 1:
-        if 3 <= total <= 4:
-            return Particle(1)
-        else:
-            return Particle(0)
-    else:
-        if total == 3:
-            return Particle(1)
-        else:
-            return Particle(0)

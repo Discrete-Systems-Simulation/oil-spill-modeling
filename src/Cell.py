@@ -39,7 +39,7 @@ class Cell:
         self.civ = copy.deepcopy(civ)
         self.cev = copy.deepcopy(cev)
 
-    def get_oil_mass(self) -> int:
+    def calculate_mass(self) -> int:
         return sum([particle.mass for particle in self.particles])
 
     def add_particle(self, new_particle: Particle):
