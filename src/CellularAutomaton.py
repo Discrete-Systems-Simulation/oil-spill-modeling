@@ -4,7 +4,7 @@ from PIL import Image
 from src.Particle import Particle
 from src.Cell import Cell
 from matplotlib import animation
-from typing import Callable, List, Tuple
+from typing import List, Tuple
 from src.Events import *
 import matplotlib.pyplot as plt
 import numpy as np
@@ -62,7 +62,7 @@ class CellularAutomaton:
             for c in range(kernel_radius, self._cells_grid_size - kernel_radius):
                 neighbourhood = self._cells[-1, r - kernel_radius:r + kernel_radius +
                                             1, c - kernel_radius: c + kernel_radius + 1]
-                for rule in ['Advection', 'Spreading']:
+                for rule in ['Advection']:
                     if rule == 'Advection':
                         new_cell = Advection.apply(neighbourhood)
                         if new_cell is not None:
@@ -115,7 +115,7 @@ class CellularAutomaton:
             f"Time: {int(i * config.params['step'] / 3600)}h")
         self._ax.imshow(im)
         self._ax.imshow(self.get_all_masses(i), cmap="binary_alpha", alpha=0.8,
-                        extent=(0, self.rows, self.cols, 0), vmin=0.0, vmax=20.0)
+                        extent=(0, self.rows, self.cols, 0), vmin=0.0, vmax=5.0)
         return self._ax,
 
     def plot_animate(self, filename: str):
