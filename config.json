@@ -4,11 +4,12 @@
     "op_mass": 5,
     "step": 6400,
     "map_size": 1000000,
-    "particles_grid_size": 1000,
-    "cells_grid_size": 100
+    "particles_grid_size": 100,
+    "cells_grid_size": 10
   },
   "data": {
     "initial_state": [
+      [20, 20]
     ]
   }
 }

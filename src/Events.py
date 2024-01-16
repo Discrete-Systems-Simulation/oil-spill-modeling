@@ -81,8 +81,10 @@ class Spreading:
                             new_neighbourhood[kernel_size // 2, kernel_size // 2] = center_cell
                 else:
                     if len(center_cell.particles) < 2:
+                        # print("ddddddsass")
                         continue
                     r = abs(delta_m) / current_cell_oil_mass
+                    # print("r:", r)
                     for particle in center_cell.particles:
                         if random.uniform(0, 1) < r:
                             # move to neigh cell
@@ -98,8 +100,20 @@ class Spreading:
         source_cell_cpy = copy.deepcopy(source_cell)
         target_cell_cpy = copy.deepcopy(target_cell)
 
+        new_particle = Particle(
+            particle.get_x() + (target_cell.x - source_cell.x),
+            particle.get_y() + (target_cell.y - source_cell.y),
+        )
+        if new_particle.get_x() > 99:
+            new_particle.set_x(99)
+        if new_particle.get_y() > 99:
+            new_particle.set_y(99)
         # source_cell_cpy.particles.remove(particle)
-        target_cell_cpy.add_particle(particle)
+        target_cell_cpy.add_particle(new_particle)
+        # print("particles:")
+        # for particle in target_cell_cpy.particles:
+        #     print(particle.get_x(), particle.get_y())
+
 
         return source_cell_cpy, target_cell_cpy
 
