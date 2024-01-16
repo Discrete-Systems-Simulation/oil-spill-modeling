@@ -45,7 +45,7 @@ class Cell:
     def add_particle(self, new_particle: Particle):
         for op in self.particles:
             if op.get_x() == new_particle.get_x() and op.get_y() == new_particle.get_y():
-                # op.mass += new_particle.mass
+                op.mass += new_particle.mass
                 return
 
         self.particles.append(new_particle)

@@ -8,6 +8,9 @@ from typing import Callable, List, Tuple
 from src.Events import *
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.colors import LinearSegmentedColormap
+
+config = Config("config.json")
 
 
 class CellularAutomaton:
@@ -41,18 +44,10 @@ class CellularAutomaton:
         self._ax.grid(color='w', linewidth=1)
 
     def evolve(self, timestamps: int):
-        # TEMP - w sumie nie pamiętam na jakich danych wyszedł ten gif co wysłaliśmy
-        self._cells[0, 4, 5].cev.sea_current_speed_horizontal = 0.9
-        self._cells[0, 4, 5].cev.sea_current_speed_vertical = 0.3
-        self._cells[0, 4, 6].cev.sea_current_speed_horizontal = 0.7
-        self._cells[0, 4, 6].cev.sea_current_speed_vertical = 0.5
-        self._cells[0, 4, 7].cev.sea_current_speed_horizontal = 0.5
-        self._cells[0, 4, 7].cev.sea_current_speed_vertical = 0.6
-        #
         for iteration in range(timestamps):
-            for i in range(460, 500):
-                for j in range(460, 500):
-                    if (i - 480) ** 2 + (j - 480) ** 2 <= 20 ** 2:
+            for i in range(430, 470):
+                for j in range(430, 470):
+                    if (i - 450) ** 2 + (j - 450) ** 2 <= 15 ** 2:
                         self._cells[iteration, 4, 4].add_particle(
                             Particle(i, j))
             print("Iteration:", iteration + 1)
@@ -91,6 +86,7 @@ class CellularAutomaton:
                         particle.get_x()
                     ] = particle.mass
 
+        # print(sum([sum(row) for row in oil_masses]))
         return oil_masses
 
     def plot(self):
@@ -98,16 +94,27 @@ class CellularAutomaton:
                         extent=(0, self.rows, self.cols, 0))
         plt.show()
 
+    def create_cmap(self):
+        ncolors = 256
+        color_array = plt.get_cmap('binary')(range(ncolors))
+        color_array[:, -1] = np.linspace(0.0, 1.0, ncolors)
+        map_object = LinearSegmentedColormap.from_list(
+            name='binary_alpha', colors=color_array)
+        plt.colormaps.register(cmap=map_object)
+
     def update_frame(self, i: int) -> Tuple:
         print("Frame:", i)
         im = np.array(Image.open('out/img/map.png'))
+        self._ax.set_title(
+            f"Time: {int(i * config.params['step'] / 3600)}h")
         self._ax.imshow(im)
-        self._ax.imshow(self.get_all_masses(i), cmap="binary", alpha=0.3,
-                        extent=(0, self.rows, self.cols, 0))
+        self._ax.imshow(self.get_all_masses(i), cmap="binary_alpha", alpha=0.8,
+                        extent=(0, self.rows, self.cols, 0), vmin=0.0, vmax=20.0)
         return self._ax,
 
     def plot_animate(self, filename: str):
         print("Animating...")
+        self.create_cmap()
         ani = animation.FuncAnimation(
             self._fig, self.update_frame, frames=self._cells.shape[0])
         writer = animation.PillowWriter(fps=7)
