@@ -13,6 +13,7 @@ def oil_spill_test():
         config.params["particles_grid_size"],
         config.params["cells_grid_size"]
     )
+
     # plt.figure()
     # plt.imshow(np.array([[1 if (r, c) in config.data["initial_state"] else 0 for c in range(1000)] for r in range(1000)]), 'gray')
     # plt.show()

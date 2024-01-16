@@ -41,14 +41,6 @@ class CellularAutomaton:
         self._ax.grid(color='w', linewidth=1)
 
     def evolve(self, timestamps: int):
-        # TEMP - w sumie nie pamiętam na jakich danych wyszedł ten gif co wysłaliśmy
-        self._cells[0, 4, 5].cev.sea_current_speed_horizontal = 0.9
-        self._cells[0, 4, 5].cev.sea_current_speed_vertical = 0.3
-        self._cells[0, 4, 6].cev.sea_current_speed_horizontal = 0.7
-        self._cells[0, 4, 6].cev.sea_current_speed_vertical = 0.5
-        self._cells[0, 4, 7].cev.sea_current_speed_horizontal = 0.5
-        self._cells[0, 4, 7].cev.sea_current_speed_vertical = 0.6
-        #
         for iteration in range(timestamps):
             for i in range(460, 500):
                 for j in range(460, 500):

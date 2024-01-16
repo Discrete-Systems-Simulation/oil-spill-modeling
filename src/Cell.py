@@ -48,7 +48,8 @@ class Cell:
                                          config_variables['sea_current_speed_y'],
                                          config_variables['temperature'],
                                          config_variables['is_land'],)
-#         self.civ = copy.deepcopy(civ)
+
+        # self.civ = copy.deepcopy(civ)
 #         self.cev = copy.deepcopy(cev)
 
     def calculate_mass(self) -> int:
