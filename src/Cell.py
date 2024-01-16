@@ -5,7 +5,7 @@ import copy
 
 @dataclass
 class CellInternalVariables:
-    oil_thickness: float = 2.0
+    oil_thickness: float = 1.0
     water_content: float = 1.0
 
 

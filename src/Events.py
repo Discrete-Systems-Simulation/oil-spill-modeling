@@ -49,6 +49,7 @@ class Spreading:
     density_diff = 0.073  # kg/m^3
     kinematic_viscosity = 1.04e-6  # m^2/s
     time_step = config.params["step"]
+    particles_grid_size = config.params["particles_grid_size"]
     # terminal_thickness = 10 ** (-5)
 
     @classmethod
@@ -104,10 +105,10 @@ class Spreading:
             particle.get_x() + (target_cell.x - source_cell.x),
             particle.get_y() + (target_cell.y - source_cell.y),
         )
-        if new_particle.get_x() > 99:
-            new_particle.set_x(99)
-        if new_particle.get_y() > 99:
-            new_particle.set_y(99)
+        if new_particle.get_x() > cls.particles_grid_size - 1:
+            new_particle.set_x(cls.particles_grid_size - 1)
+        if new_particle.get_y() > cls.particles_grid_size - 1:
+            new_particle.set_y(cls.particles_grid_size - 1)
         # source_cell_cpy.particles.remove(particle)
         target_cell_cpy.add_particle(new_particle)
         # print("particles:")

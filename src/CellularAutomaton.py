@@ -42,10 +42,10 @@ class CellularAutomaton:
 
     def evolve(self, timestamps: int):
         for iteration in range(timestamps):
-            for i in range(40, 50):
-                for j in range(40, 50):
+            for i in range(490, 500):
+                for j in range(490, 500):
                     # if (i - 480) ** 2 + (j - 480) ** 2 <= 20 ** 2:
-                    self._cells[iteration, 4, 4].add_particle(
+                    self._cells[iteration, 49, 49].add_particle(
                             Particle(i, j))
             print("Iteration:", iteration + 1)
             self._cells = np.concatenate((self._cells, self.convolution(iteration).reshape(
@@ -59,7 +59,7 @@ class CellularAutomaton:
             for c in range(kernel_radius, self._cells_grid_size - kernel_radius):
                 neighbourhood = self._cells[-1, r - kernel_radius:r + kernel_radius +
                                             1, c - kernel_radius: c + kernel_radius + 1]
-                for rule in ['Advection_', 'Spreading']:
+                for rule in ['Advection', 'Spreading']:
                     if rule == 'Advection':
                         new_cell = Advection.apply(neighbourhood)
                         if new_cell is not None:
