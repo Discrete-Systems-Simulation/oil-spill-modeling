@@ -1,4 +1,7 @@
 from typing import Union
+from src.Config import Config
+
+config = Config("config.json")
 
 
 class Particle:
@@ -10,10 +13,10 @@ class Particle:
     _x: int  # column number
     mass: int
 
-    def __init__(self, y: Union[int, float], x: Union[int, float], mass=5.0):
+    def __init__(self, y: Union[int, float], x: Union[int, float]):
         self._y = round(y)
         self._x = round(x)
-        self.mass = mass
+        self.mass = config.params['op_mass']
 
     def get_mass(self) -> int:
         return self.mass

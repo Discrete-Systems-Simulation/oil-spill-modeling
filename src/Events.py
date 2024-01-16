@@ -12,7 +12,7 @@ class Advection:
     beta = 0.03
     timestep = config.params["step"]
     unit_length = config.params["map_size"] / \
-        config.params["particles_grid_size"]  # m
+                  config.params["particles_grid_size"]  # m
 
     @classmethod
     def apply(cls, neighbourhood: np.ndarray) -> Cell:
@@ -29,10 +29,10 @@ class Advection:
 
     @classmethod
     def _apply_single_cell(cls, cell: Cell) -> Cell:
-        x_change = (cls.alpha * cell.cev.sea_current_speed_horizontal +
-                    cls.beta * cell.cev.wind_speed_horizontal) * cls.timestep / cls.unit_length
-        y_change = (cls.alpha * cell.cev.sea_current_speed_vertical +
-                    cls.beta * cell.cev.wind_speed_vertical) * cls.timestep / cls.unit_length
+        x_change = (cls.alpha * cell.cev.sea_current_speed_x +
+                    cls.beta * cell.cev.wind_speed_x) * cls.timestep / cls.unit_length
+        y_change = (cls.alpha * cell.cev.sea_current_speed_y +
+                    cls.beta * cell.cev.wind_speed_y) * cls.timestep / cls.unit_length
         for particle in cell.particles:
             particle.set_x(particle.get_x() + x_change)
             particle.set_y(particle.get_y() + y_change)

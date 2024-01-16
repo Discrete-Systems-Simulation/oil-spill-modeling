@@ -14,5 +14,5 @@ class Config:
             settings = json.load(f)
 
         self.params = settings["params"]
-        self.data = settings["data"]
-        self.data["initial_state"] = [tuple(value) for value in self.data["initial_state"]]
+        self.data = settings["cells"]
+        # self.data["initial_state"] = [tuple(value) for value in self.data["initial_state"]]
