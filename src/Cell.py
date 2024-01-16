@@ -5,7 +5,7 @@ import copy
 
 @dataclass
 class CellInternalVariables:
-    oil_thickness: float = 0.0
+    oil_thickness: float = 1.0
     water_content: float = 1.0
 
 
@@ -15,7 +15,7 @@ class CellExternalVariables:  # To read from config()
     wind_speed_vertical: int = -20  # + -> down (m/s)
     sea_current_speed_horizontal: int = 1  # + -> right (m/s)
     sea_current_speed_vertical: int = 0  # + -> down (m/s)
-    temperature: float = 15 + 273.15  # Kelwins
+    temperature: float = 15 + 273.15  # Kelvins
     is_land: bool = False
 
 
