@@ -36,43 +36,41 @@ class CellularAutomaton:
         self._cells = np.array([[[Cell(i * self._cell_size, j * self._cell_size, self._cell_size)
                                  for j in range(cells_grid_size)] for i in range(cells_grid_size)]])
         self._fig, self._ax = plt.subplots()
-        self._ax.set_xticks([x for x in range(0, self.cols, self._cell_size)])
-        self._ax.set_yticks([x for x in range(0, self.rows, self._cell_size)])
-        self._ax.grid(color='w', linewidth=1)
+        # self._ax.set_xticks([x for x in range(0, self.cols, self._cell_size)])
+        # self._ax.set_yticks([x for x in range(0, self.rows, self._cell_size)])
+        # self._ax.grid(color='w', linewidth=1)
 
     def evolve(self, timestamps: int):
-        # TEMP - w sumie nie pamiętam na jakich danych wyszedł ten gif co wysłaliśmy
-        self._cells[0, 4, 5].cev.sea_current_speed_horizontal = 0.9
-        self._cells[0, 4, 5].cev.sea_current_speed_vertical = 0.3
-        self._cells[0, 4, 6].cev.sea_current_speed_horizontal = 0.7
-        self._cells[0, 4, 6].cev.sea_current_speed_vertical = 0.5
-        self._cells[0, 4, 7].cev.sea_current_speed_horizontal = 0.5
-        self._cells[0, 4, 7].cev.sea_current_speed_vertical = 0.6
-        #
         for iteration in range(timestamps):
-            for i in range(460, 500):
-                for j in range(460, 500):
-                    if (i - 480) ** 2 + (j - 480) ** 2 <= 20 ** 2:
-                        self._cells[iteration, 4, 4].add_particle(
+            for i in range(490, 500):
+                for j in range(490, 500):
+                    # if (i - 480) ** 2 + (j - 480) ** 2 <= 20 ** 2:
+                    self._cells[iteration, 49, 49].add_particle(
                             Particle(i, j))
             print("Iteration:", iteration + 1)
-            self._cells = np.concatenate((self._cells, self.convolution().reshape(
+            self._cells = np.concatenate((self._cells, self.convolution(iteration).reshape(
                 1, self._cells_grid_size, self._cells_grid_size)), axis=0)
 
-    def convolution(self) -> np.ndarray:
+    def convolution(self, iteration: int) -> np.ndarray:
         new_frame = self._cells[-1].copy()
         kernel_size = 3
         kernel_radius = kernel_size//2
         for r in range(kernel_radius, self._cells_grid_size - kernel_radius):
             for c in range(kernel_radius, self._cells_grid_size - kernel_radius):
+                neighbourhood = self._cells[-1, r - kernel_radius:r + kernel_radius +
+                                            1, c - kernel_radius: c + kernel_radius + 1]
                 for rule in ['Advection', 'Spreading']:
-                    neighbourhood = \
-                        self._cells[-1, r - kernel_radius:r + kernel_radius +
-                                    1, c - kernel_radius: c + kernel_radius + 1]
-                    new_cell = getattr(sys.modules[__name__], rule)\
-                        .apply(neighbourhood)
-                    if new_cell is not None:
-                        new_frame[r, c] = new_cell
+                    if rule == 'Advection':
+                        new_cell = Advection.apply(neighbourhood)
+                        if new_cell is not None:
+                            new_frame[r, c] = new_cell
+                    if rule == 'Spreading':
+                        new_neighbourhood = Spreading.apply(neighbourhood, iteration)
+                        # print("New frame:", new_frame[r - kernel_radius:r + kernel_radius + 1, c - kernel_radius: c + kernel_radius + 1], ", new neighbourhood:", new_neighbourhood)
+                        new_frame[r - kernel_radius:r + kernel_radius + 1, c - kernel_radius: c + kernel_radius + 1]\
+                            = new_neighbourhood
+                    neighbourhood = new_frame[r - kernel_radius:r + kernel_radius +
+                                              1, c - kernel_radius: c + kernel_radius + 1]
 
         return new_frame
 
