@@ -45,7 +45,7 @@ class CellularAutomaton:
 
     def evolve(self, timestamps: int):
         for iteration in range(timestamps):
-            if int(i * config.params['step'] / 3600) < 12:
+            if int(iteration * config.params['step'] / 3600) < 12:
                 for i in range(490, 500):
                     for j in range(490, 500):
                         # if (i - 480) ** 2 + (j - 480) ** 2 <= 20 ** 2:
