@@ -47,7 +47,7 @@ class CellularAutomaton:
         for iteration in range(timestamps):
             for i in range(490, 500):
                 for j in range(490, 500):
-                    # if (i - 480) ** 2 + (j - 480) ** 2 <= 20 ** 2:
+                    # if (i - 495) ** 2 + (j - 495) ** 2 <= 5 ** 2:
                     self._cells[iteration, 49, 49].add_particle(
                             Particle(i, j))
             print("Iteration:", iteration + 1)

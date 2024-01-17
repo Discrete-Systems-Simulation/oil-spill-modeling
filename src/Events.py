@@ -78,8 +78,7 @@ class Spreading:
 
                 delta_m = (0.5 * (current_cell_oil_mass - neigh_cell_oil_mass) *
                            (1 - np.exp(-2 * (d/(cell.size**2)) * cls.time_step)))
-                # print("d:", d)
-                # print("delta_m:", delta_m)
+
                 if delta_m < 0:
                     if len(cell.particles) < 2:
                         continue
@@ -92,10 +91,8 @@ class Spreading:
                             new_neighbourhood[kernel_size // 2, kernel_size // 2] = center_cell
                 else:
                     if len(center_cell.particles) < 2:
-                        # print("ddddddsass")
                         continue
                     r = abs(delta_m) / current_cell_oil_mass
-                    # print("r:", r)
                     for particle in center_cell.particles:
                         if random.uniform(0, 1) < r:
                             # move to neigh cell
@@ -107,7 +104,7 @@ class Spreading:
 
     @classmethod
     def _move_particle(cls, particle: Particle, source_cell: Cell, target_cell: Cell) -> Tuple[Cell, Cell]:
-        # print("move!")
+        # print("move")
         source_cell_cpy = copy.deepcopy(source_cell)
         target_cell_cpy = copy.deepcopy(target_cell)
 
@@ -119,12 +116,25 @@ class Spreading:
             new_particle.set_x(cls.particles_grid_size - 1)
         if new_particle.get_y() > cls.particles_grid_size - 1:
             new_particle.set_y(cls.particles_grid_size - 1)
+
         # source_cell_cpy.particles.remove(particle)
-        target_cell_cpy.add_particle(new_particle)
+        # for i, prt in enumerate(source_cell_cpy.particles):
+        #     if prt.get_x() == particle.get_x() and prt.get_y() == particle.get_y():
+        #         source_cell_cpy.particles.pop(i)
+
+        # target_cell_cpy.add_particle(new_particle)
+        added = False
+        for op in target_cell_cpy.particles:
+            if op.get_x() != new_particle.get_x() and op.get_y() != new_particle.get_y():
+                target_cell_cpy.add_particle(new_particle)
+                added = True
+                break
+        if not added:
+            target_cell_cpy.add_particle(new_particle)
+
         # print("particles:")
         # for particle in target_cell_cpy.particles:
         #     print(particle.get_x(), particle.get_y())
-
 
         return source_cell_cpy, target_cell_cpy
 
