@@ -15,4 +15,4 @@ class Config:
 
         self.params = settings["params"]
         self.data = settings["data"]
-        self.data["initial_state"] = [tuple(value) for value in self.data["initial_state"]]
+        self.data["fractions"] = tuple([dict(el) for el in settings["data"]["fractions"]])

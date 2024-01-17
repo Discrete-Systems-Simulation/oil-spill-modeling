@@ -1,5 +1,3 @@
-import sys
-
 from PIL import Image
 from src.Particle import Particle
 from src.Cell import Cell
@@ -49,7 +47,7 @@ class CellularAutomaton:
                 for j in range(490, 500):
                     # if (i - 480) ** 2 + (j - 480) ** 2 <= 20 ** 2:
                     self._cells[iteration, 49, 49].add_particle(
-                            Particle(i, j))
+                        Particle(i, j))
             print("Iteration:", iteration + 1)
             self._cells = np.concatenate((self._cells, self.convolution(iteration).reshape(
                 1, self._cells_grid_size, self._cells_grid_size)), axis=0)
@@ -58,20 +56,27 @@ class CellularAutomaton:
         new_frame = self._cells[-1].copy()
         kernel_size = 3
         kernel_radius = kernel_size//2
+
         for r in range(kernel_radius, self._cells_grid_size - kernel_radius):
             for c in range(kernel_radius, self._cells_grid_size - kernel_radius):
                 neighbourhood = self._cells[-1, r - kernel_radius:r + kernel_radius +
                                             1, c - kernel_radius: c + kernel_radius + 1]
-                for rule in ['Advection']:
+                for rule in ['Advection', 'Spreading', 'Evaporation']:
                     if rule == 'Advection':
                         new_cell = Advection.apply(neighbourhood)
                         if new_cell is not None:
                             new_frame[r, c] = new_cell
                     if rule == 'Spreading':
-                        new_neighbourhood = Spreading.apply(neighbourhood, iteration)
+                        new_neighbourhood = Spreading.apply(
+                            neighbourhood, iteration)
                         # print("New frame:", new_frame[r - kernel_radius:r + kernel_radius + 1, c - kernel_radius: c + kernel_radius + 1], ", new neighbourhood:", new_neighbourhood)
                         new_frame[r - kernel_radius:r + kernel_radius + 1, c - kernel_radius: c + kernel_radius + 1]\
                             = new_neighbourhood
+                    if rule == 'Evaporation':
+                        new_cell = Evaporation.apply(
+                            neighbourhood[kernel_radius, kernel_radius])
+                        if new_cell is not None:
+                            new_frame[r, c] = new_cell
                     neighbourhood = new_frame[r - kernel_radius:r + kernel_radius +
                                               1, c - kernel_radius: c + kernel_radius + 1]
 
@@ -91,8 +96,7 @@ class CellularAutomaton:
                         particle.get_y(),
                         particle.get_x()
                     ] = particle.mass
-
-        # print(sum([sum(row) for row in oil_masses]))
+        
         return oil_masses
 
     def plot(self):
@@ -114,8 +118,8 @@ class CellularAutomaton:
         self._ax.set_title(
             f"Time: {int(i * config.params['step'] / 3600)}h")
         self._ax.imshow(im)
-        self._ax.imshow(self.get_all_masses(i), cmap="binary_alpha", alpha=0.8,
-                        extent=(0, self.rows, self.cols, 0), vmin=0.0, vmax=5.0)
+        self._ax.imshow([[cell.calculate_mass() for cell in row] for row in self._cells[i]], cmap="binary_alpha", alpha=0.8,
+                        extent=(0, self.rows, self.cols, 0))
         return self._ax,
 
     def plot_animate(self, filename: str):
