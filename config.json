@@ -1,14 +1,30 @@
 {
   "params": {
-    "cell_size": 200,
     "op_mass": 5,
     "step": 6400,
-    "map_size": 1000000,
+    "map_size_meters": 200000,
     "particles_grid_size": 1000,
     "cells_grid_size": 100
   },
   "data": {
-    "initial_state": [
+    "cells": [],
+    "fractions": [
+      { "mass_content": 2, "boiling_point": 313, "molar_mass": 0.0437 },
+      { "mass_content": 1, "boiling_point": 353, "molar_mass": 0.0615 },
+      { "mass_content": 2, "boiling_point": 373, "molar_mass": 0.072 },
+      { "mass_content": 12, "boiling_point": 393, "molar_mass": 0.0835 },
+      { "mass_content": 3, "boiling_point": 413, "molar_mass": 0.0962 },
+      { "mass_content": 3, "boiling_point": 433, "molar_mass": 0.11 },
+      { "mass_content": 3, "boiling_point": 453, "molar_mass": 0.1251 },
+      { "mass_content": 4, "boiling_point": 473, "molar_mass": 0.1415 },
+      { "mass_content": 9, "boiling_point": 523, "molar_mass": 0.1884 },
+      { "mass_content": 10, "boiling_point": 573, "molar_mass": 0.2443 },
+      { "mass_content": 10, "boiling_point": 623, "molar_mass": 0.31 },
+      { "mass_content": 9, "boiling_point": 673, "molar_mass": 0.3682 },
+      { "mass_content": 9, "boiling_point": 723, "molar_mass": 0.4736 },
+      { "mass_content": 7, "boiling_point": 773, "molar_mass": 0.573 },
+      { "mass_content": 5, "boiling_point": 823, "molar_mass": 0.6849 },
+      { "mass_content": 11, "boiling_point": 900, "molar_mass": 0.8834 }
     ]
   }
 }

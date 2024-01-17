@@ -16,15 +16,60 @@ class Evaporation:
     R = 8.314  # J / (mol * K)
     T_b = 100  # K
     rho_w = 1000  # kg/m^3
-    rho_o = 870  # kg/m^3
-    # TODO: Rys
+    rho_o = 880  # kg/m^3
+
+    @classmethod
+    def delta_m_I(cls, cell: Cell, fraction):
+        return (cls.K * cls.M_I(fraction) * cls.P_I(cell, fraction) * cls.x_I(cell, fraction) * cls.A(cell) * config.params["step"]) / cls.R * cell.cev.temperature
+
+    @classmethod
+    def M_I(cls, fraction):
+        return fraction["molar_mass"]
+
+    @classmethod
+    def T_bI(cls, fraction):
+        return fraction["boiling_point"]
+
+    @classmethod
+    def P_I(cls, cell: Cell, fraction):
+        return np.exp(-(4.4 + np.log(cls.T_bI(fraction)))*(1.803*cls.T_bI(fraction)/(cell.cev.temperature-1)-0.803*np.log(cls.T_bI(fraction)/cell.cev.temperature))) * 1e3
+
+    @classmethod
+    def w_I(cls, fraction):
+        return fraction["mass_content"]
+
+    @classmethod
+    def x_I(cls, cell: Cell, fraction):
+        return (cls.w_I(fraction)/cls.M_I(fraction))/(sum([cls.w_I(j)/cls.M_I(j) for j in cell.civ.fractions]))
+
+    @classmethod
+    def A(cls, cell):
+        return (config.params["map_size_meters"] / config.params["cells_grid_size"])**2 / len(cell.particles)
+
+    @classmethod
+    def apply(cls, cell: Cell):
+        new_cell = copy.deepcopy(cell)
+        if len(cell.particles) == 0:
+            return new_cell
+
+        mass_change = 0
+        for fraction in cell.civ.fractions:
+            mass_change += cls.delta_m_I(cell, fraction)
+
+        for particle in new_cell.particles:
+            if particle.mass - mass_change > 0:
+                particle.mass -= mass_change
+            else:
+                particle.mass = 0
+
+        return new_cell
 
 
 class Advection:
     alpha = 1.1
     beta = 0.03
     timestep = config.params["step"]  # s
-    unit_length = config.params["map_size"] / \
+    unit_length = config.params["map_size_meters"] / \
         config.params["particles_grid_size"]  # m
 
     @classmethod
@@ -86,9 +131,11 @@ class Spreading:
                     for particle in cell.particles:
                         if random.uniform(0, 1) < r:
                             # move to current cell
-                            cell, center_cell = cls._move_particle(particle, cell, center_cell)
+                            cell, center_cell = cls._move_particle(
+                                particle, cell, center_cell)
                             new_neighbourhood[i, j] = cell
-                            new_neighbourhood[kernel_size // 2, kernel_size // 2] = center_cell
+                            new_neighbourhood[kernel_size // 2,
+                                              kernel_size // 2] = center_cell
                 else:
                     if len(center_cell.particles) < 2:
                         continue
@@ -96,9 +143,11 @@ class Spreading:
                     for particle in center_cell.particles:
                         if random.uniform(0, 1) < r:
                             # move to neigh cell
-                            center_cell, cell = cls._move_particle(particle, center_cell, cell)
+                            center_cell, cell = cls._move_particle(
+                                particle, center_cell, cell)
                             new_neighbourhood[i, j] = cell
-                            new_neighbourhood[kernel_size // 2, kernel_size // 2] = center_cell
+                            new_neighbourhood[kernel_size // 2,
+                                              kernel_size // 2] = center_cell
 
         return new_neighbourhood
 

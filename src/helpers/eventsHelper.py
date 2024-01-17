@@ -4,8 +4,8 @@ from src.Cell import Cell
 def check_boundaries(new_neighbourhood, center_cell: Cell):
     left = center_cell.x
     up = center_cell.y
-    right = center_cell.x + center_cell.size
-    down = center_cell.y + center_cell.size
+    right = center_cell.x + center_cell.size - 1
+    down = center_cell.y + center_cell.size - 1
     remove_outer_particles(center_cell, left, up, right, down)
     add_particles_from_neighbours(
         new_neighbourhood, center_cell, left, up, right, down)
@@ -16,7 +16,7 @@ def add_particles_from_neighbours(new_neighbourhood, center_cell, left, up, righ
         for cell in row:
             if cell != center_cell:
                 for particle in cell.particles:
-                    if left < particle.get_x() < right and up < particle.get_y() < down:
+                    if left <= particle.get_x() <= right and up <= particle.get_y() <= down:
                         center_cell.add_particle(particle)
 
 
