@@ -125,7 +125,7 @@ class Spreading:
                            (1 - np.exp(-2 * (d/(cell.size**2)) * cls.time_step)))
 
                 if delta_m < 0:
-                    if len(cell.particles) < 2:
+                    if len(cell.particles) < 2 or cell.civ.oil_thickness <= 0:
                         continue
                     r = abs(delta_m) / neigh_cell_oil_mass
                     for particle in cell.particles:
@@ -137,7 +137,7 @@ class Spreading:
                             new_neighbourhood[kernel_size // 2,
                                               kernel_size // 2] = center_cell
                 else:
-                    if len(center_cell.particles) < 2:
+                    if len(center_cell.particles) < 2 or center_cell.civ.oil_thickness <= 0:
                         continue
                     r = abs(delta_m) / current_cell_oil_mass
                     for particle in center_cell.particles:
@@ -158,8 +158,8 @@ class Spreading:
         target_cell_cpy = copy.deepcopy(target_cell)
 
         new_particle = Particle(
-            particle.get_x() + (target_cell.x - source_cell.x),
-            particle.get_y() + (target_cell.y - source_cell.y),
+            particle.get_x() + (target_cell.x - source_cell.x) // source_cell.size,
+            particle.get_y() + (target_cell.y - source_cell.y) // source_cell.size,
         )
         if new_particle.get_x() > cls.particles_grid_size - 1:
             new_particle.set_x(cls.particles_grid_size - 1)
@@ -167,19 +167,9 @@ class Spreading:
             new_particle.set_y(cls.particles_grid_size - 1)
 
         # source_cell_cpy.particles.remove(particle)
-        # for i, prt in enumerate(source_cell_cpy.particles):
-        #     if prt.get_x() == particle.get_x() and prt.get_y() == particle.get_y():
-        #         source_cell_cpy.particles.pop(i)
 
-        # target_cell_cpy.add_particle(new_particle)
-        added = False
-        for op in target_cell_cpy.particles:
-            if op.get_x() != new_particle.get_x() and op.get_y() != new_particle.get_y():
-                target_cell_cpy.add_particle(new_particle)
-                added = True
-                break
-        if not added:
-            target_cell_cpy.add_particle(new_particle)
+        target_cell_cpy.add_particle(new_particle)
+        target_cell_cpy.civ.oil_thickness -= 0.2
 
         # print("particles:")
         # for particle in target_cell_cpy.particles:

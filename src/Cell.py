@@ -10,7 +10,7 @@ config = Config("config.json")
 
 @dataclass
 class CellInternalVariables:
-    oil_thickness: float = 1.0
+    oil_thickness: float = 5.0
     water_content: float = 1.0
     fractions: List = config.data["fractions"]
 
@@ -55,3 +55,4 @@ class Cell:
                 return
 
         self.particles.append(new_particle)
+

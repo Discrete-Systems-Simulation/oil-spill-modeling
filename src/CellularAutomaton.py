@@ -46,9 +46,9 @@ class CellularAutomaton:
         for iteration in range(timestamps):
             for i in range(490, 500):
                 for j in range(490, 500):
-                    # if (i - 495) ** 2 + (j - 495) ** 2 <= 5 ** 2:
-                    self._cells[iteration, 49, 49].add_particle(
-                        Particle(i, j))
+                    if (i - 495) ** 2 + (j - 495) ** 2 <= 5 ** 2:
+                        self._cells[iteration, 49, 49].add_particle(
+                            Particle(i, j))
             print("Iteration:", iteration + 1)
             self._cells = np.concatenate((self._cells, self.convolution(iteration).reshape(
                 1, self._cells_grid_size, self._cells_grid_size)), axis=0)
@@ -63,19 +63,17 @@ class CellularAutomaton:
                 neighbourhood = self._cells[-1, r - kernel_radius:r + kernel_radius +
                                             1, c - kernel_radius: c + kernel_radius + 1]
                 for rule in ['Advection', 'Spreading', 'Evaporation']:
+                    if rule == 'Spreading':
+                        new_neighbourhood = Spreading.apply(
+                            neighbourhood, iteration)
+                        new_frame[r - kernel_radius:r + kernel_radius + 1, c - kernel_radius: c + kernel_radius + 1]\
+                            = new_neighbourhood
                     if rule == 'Advection':
                         new_cell = Advection.apply(neighbourhood)
                         if new_cell is not None:
                             new_frame[r, c] = new_cell
-                    if rule == 'Spreading':
-                        new_neighbourhood = Spreading.apply(
-                            neighbourhood, iteration)
-                        # print("New frame:", new_frame[r - kernel_radius:r + kernel_radius + 1, c - kernel_radius: c + kernel_radius + 1], ", new neighbourhood:", new_neighbourhood)
-                        new_frame[r - kernel_radius:r + kernel_radius + 1, c - kernel_radius: c + kernel_radius + 1]\
-                            = new_neighbourhood
                     if rule == 'Evaporation':
-                        new_cell = Evaporation.apply(
-                            neighbourhood[kernel_radius, kernel_radius])
+                        new_cell = Evaporation.apply(neighbourhood[kernel_radius, kernel_radius])
                         if new_cell is not None:
                             new_frame[r, c] = new_cell
                     neighbourhood = new_frame[r - kernel_radius:r + kernel_radius +
