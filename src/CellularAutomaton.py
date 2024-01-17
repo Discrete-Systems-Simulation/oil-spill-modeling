@@ -36,7 +36,8 @@ class CellularAutomaton:
             raise Exception("Incorrect number of cells")
 
         self._cells_grid_size = cells_grid_size
-        self._cells = np.array([[[Cell(i * self._cell_size, j * self._cell_size, self._cell_size, cev=CellExternalVariables(**config.data["cells"][i][j]))
+        self._cells = np.array([[[Cell(i * self._cell_size, j * self._cell_size, self._cell_size)
+                                    #    cev=CellExternalVariables(**config.data["cells"][i][j]))
                                  for j in range(cells_grid_size)] for i in range(cells_grid_size)]])
         self._fig, self._ax = plt.subplots()
         # self._ax.set_xticks([x for x in range(0, self.cols, self._cell_size)])
@@ -67,7 +68,7 @@ class CellularAutomaton:
             for c in range(kernel_radius, self._cells_grid_size - kernel_radius):
                 neighbourhood = self._cells[-1, r - kernel_radius:r + kernel_radius +
                                             1, c - kernel_radius: c + kernel_radius + 1]
-                for rule in ['Advection', 'Spreading', 'Evaporation']:
+                for rule in ['Advection', 'Spreading']:
                     if rule == 'Advection':
                         new_cell = Advection.apply(neighbourhood)
                         if new_cell is not None:
@@ -85,6 +86,12 @@ class CellularAutomaton:
                             new_frame[r, c] = new_cell
                     neighbourhood = new_frame[r - kernel_radius:r + kernel_radius +
                                               1, c - kernel_radius: c + kernel_radius + 1]
+
+        # Evaporation
+        for r in range(kernel_radius, self._cells_grid_size - kernel_radius):
+            for c in range(kernel_radius, self._cells_grid_size - kernel_radius):
+                new_cell = Evaporation.apply(new_frame[r, c])
+                new_frame[r, c] = new_cell
 
         return new_frame
 
@@ -140,7 +147,7 @@ class CellularAutomaton:
         print("Animating cells...")
         ani = animation.FuncAnimation(
             self._fig, self.update_frame_cells, frames=self._cells.shape[0])
-        writer = animation.PillowWriter(fps=7)
+        writer = animation.PillowWriter(fps=2)
         ani.save(filename, writer=writer)
 
     def plot_animate_particles(self, filename: str):
@@ -149,5 +156,5 @@ class CellularAutomaton:
         print("Animating particles...")
         ani = animation.FuncAnimation(
             self._fig, self.update_frame_particles, frames=self._cells.shape[0])
-        writer = animation.PillowWriter(fps=7)
+        writer = animation.PillowWriter(fps=2)
         ani.save(filename, writer=writer)

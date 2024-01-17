@@ -1,7 +1,7 @@
 {
   "params": {
     "op_mass": 5,
-    "step": 900,
+    "step": 3600,
     "map_size_meters": 200000,
     "particles_grid_size": 1000,
     "cells_grid_size": 100
