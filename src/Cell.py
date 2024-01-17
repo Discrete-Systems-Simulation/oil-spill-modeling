@@ -17,10 +17,10 @@ class CellInternalVariables:
 
 @dataclass
 class CellExternalVariables:  # To read from config()
-    wind_speed_horizontal: int = 0  # + -> right (m/s)
-    wind_speed_vertical: int = -4  # + -> down (m/s)
-    sea_current_speed_horizontal: int = 0.2  # + -> right (m/s)
-    sea_current_speed_vertical: int = 0  # + -> down (m/s)
+    wind_speed_x: int = -6  # + -> right (m/s)
+    wind_speed_y: int = 6  # + -> down (m/s)
+    sea_current_speed_x: int = -1  # + -> right (m/s)
+    sea_current_speed_y: int = -0.1  # + -> down (m/s)
     temperature: float = 15 + 273.15  # Kelvins
     is_land: bool = False
 
