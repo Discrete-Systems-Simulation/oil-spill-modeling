@@ -15,7 +15,4 @@ class Config:
 
         self.params = settings["params"]
         self.data = settings["data"]
-        self.data["fractions"] = tuple(
-            [dict(el) for el in settings["data"]["fractions"]])
-        self.data["cells"] = tuple(
-            [[dict(el) for el in tuple(row)] for row in settings["data"]["cells"]])
+        self.data["fractions"] = tuple([dict(el) for el in settings["data"]["fractions"]])
