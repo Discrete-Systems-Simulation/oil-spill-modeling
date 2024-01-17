@@ -1,6 +1,6 @@
 from PIL import Image
 from src.Particle import Particle
-from src.Cell import Cell
+from src.Cell import Cell, CellExternalVariables
 from matplotlib import animation
 from typing import List, Tuple
 from src.Events import *
@@ -34,8 +34,9 @@ class CellularAutomaton:
             raise Exception("Incorrect number of cells")
 
         self._cells_grid_size = cells_grid_size
-        self._cells = np.array([[[Cell(i * self._cell_size, j * self._cell_size, self._cell_size)
+        self._cells = np.array([[[Cell(i * self._cell_size, j * self._cell_size, self._cell_size, cev=CellExternalVariables(**config.data["cells"][i][j]))
                                  for j in range(cells_grid_size)] for i in range(cells_grid_size)]])
+        print(self._cells[0, 0, 0].cev)
         self._fig, self._ax = plt.subplots()
         # self._ax.set_xticks([x for x in range(0, self.cols, self._cell_size)])
         # self._ax.set_yticks([x for x in range(0, self.rows, self._cell_size)])
@@ -44,10 +45,11 @@ class CellularAutomaton:
 
     def evolve(self, timestamps: int):
         for iteration in range(timestamps):
-            for i in range(490, 500):
-                for j in range(490, 500):
-                    if (i - 495) ** 2 + (j - 495) ** 2 <= 5 ** 2:
-                        self._cells[iteration, 49, 49].add_particle(
+            if int(iteration * config.params['step'] / 3600) < 12:
+                for i in range(490, 500):
+                    for j in range(490, 500):
+                        if (i - 495) ** 2 + (j - 495) ** 2 <= 5 ** 2:
+                            self._cells[iteration, 49, 49].add_particle(
                             Particle(i, j))
             print("Iteration:", iteration + 1)
             self._cells = np.concatenate((self._cells, self.convolution(iteration).reshape(
