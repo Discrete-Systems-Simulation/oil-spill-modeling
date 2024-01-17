@@ -40,6 +40,7 @@ class CellularAutomaton:
         # self._ax.set_xticks([x for x in range(0, self.cols, self._cell_size)])
         # self._ax.set_yticks([x for x in range(0, self.rows, self._cell_size)])
         # self._ax.grid(color='w', linewidth=1)
+        self.create_cmap()
 
     def evolve(self, timestamps: int):
         for iteration in range(timestamps):
@@ -96,13 +97,8 @@ class CellularAutomaton:
                         particle.get_y(),
                         particle.get_x()
                     ] = particle.mass
-        
-        return oil_masses
 
-    def plot(self):
-        self._ax.imshow(self.get_all_masses(), cmap="gray",
-                        extent=(0, self.rows, self.cols, 0))
-        plt.show()
+        return oil_masses
 
     def create_cmap(self):
         ncolors = 256
@@ -112,9 +108,10 @@ class CellularAutomaton:
             name='binary_alpha', colors=color_array)
         plt.colormaps.register(cmap=map_object)
 
-    def update_frame(self, i: int) -> Tuple:
+    def update_frame_cells(self, i: int) -> Tuple:
         print("Frame:", i)
         im = np.array(Image.open('out/img/map.png'))
+        self._ax.axis('off')
         self._ax.set_title(
             f"Time: {int(i * config.params['step'] / 3600)}h")
         self._ax.imshow(im)
@@ -122,10 +119,30 @@ class CellularAutomaton:
                         extent=(0, self.rows, self.cols, 0))
         return self._ax,
 
-    def plot_animate(self, filename: str):
-        print("Animating...")
-        self.create_cmap()
+    def update_frame_particles(self, i: int) -> Tuple:
+        print("Frame:", i)
+        im = np.array(Image.open('out/img/map.png'))
+        self._ax.axis('off')
+        self._ax.set_title(
+            f"Time: {int(i * config.params['step'] / 3600)}h")
+        self._ax.imshow(im)
+        self._ax.imshow(self.get_all_masses(i), cmap="binary_alpha", alpha=0.8,
+                        extent=(0, self.rows, self.cols, 0), vmin=0.0, vmax=5.0)
+        return self._ax,
+
+    def plot_animate_cells(self, filename: str):
+        self._fig, self._ax = plt.subplots()
+        print("Animating cells...")
         ani = animation.FuncAnimation(
-            self._fig, self.update_frame, frames=self._cells.shape[0])
+            self._fig, self.update_frame_cells, frames=self._cells.shape[0])
+        writer = animation.PillowWriter(fps=7)
+        ani.save(filename, writer=writer)
+
+    def plot_animate_particles(self, filename: str):
+        self._fig, self._ax = plt.subplots()
+        self._ax.axis('off')
+        print("Animating particles...")
+        ani = animation.FuncAnimation(
+            self._fig, self.update_frame_particles, frames=self._cells.shape[0])
         writer = animation.PillowWriter(fps=7)
         ani.save(filename, writer=writer)
