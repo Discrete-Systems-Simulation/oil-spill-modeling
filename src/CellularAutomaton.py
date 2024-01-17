@@ -7,6 +7,7 @@ from src.Events import *
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
+from src.DataWriter import DataWriter
 
 config = Config("config.json")
 
@@ -23,6 +24,7 @@ class CellularAutomaton:
     _cells_grid_size: int
     _fig: plt.Figure
     _ax: any
+    _data_writer: DataWriter
 
     def __init__(self, rows: int, cols: int, cells_grid_size: int):
         self.rows = rows
@@ -36,12 +38,12 @@ class CellularAutomaton:
         self._cells_grid_size = cells_grid_size
         self._cells = np.array([[[Cell(i * self._cell_size, j * self._cell_size, self._cell_size, cev=CellExternalVariables(**config.data["cells"][i][j]))
                                  for j in range(cells_grid_size)] for i in range(cells_grid_size)]])
-        print(self._cells[0, 0, 0].cev)
         self._fig, self._ax = plt.subplots()
         # self._ax.set_xticks([x for x in range(0, self.cols, self._cell_size)])
         # self._ax.set_yticks([x for x in range(0, self.rows, self._cell_size)])
         # self._ax.grid(color='w', linewidth=1)
         self.create_cmap()
+        self._data_writer = DataWriter("out/data")
 
     def evolve(self, timestamps: int):
         for iteration in range(timestamps):
@@ -54,6 +56,7 @@ class CellularAutomaton:
             print("Iteration:", iteration + 1)
             self._cells = np.concatenate((self._cells, self.convolution(iteration).reshape(
                 1, self._cells_grid_size, self._cells_grid_size)), axis=0)
+            self._data_writer.write_frame(self._cells[iteration], iteration)
 
     def convolution(self, iteration: int) -> np.ndarray:
         new_frame = self._cells[-1].copy()

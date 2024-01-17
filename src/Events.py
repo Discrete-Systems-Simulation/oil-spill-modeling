@@ -58,7 +58,7 @@ class Evaporation:
 
         for particle in new_cell.particles:
             if particle.mass - mass_change > 0:
-                particle.mass -= mass_change
+                particle.mass -= mass_change / 2
             else:
                 particle.mass = 0
 
