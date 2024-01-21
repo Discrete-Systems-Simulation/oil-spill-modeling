@@ -14,7 +14,6 @@ config = Config("config.json")
 class Evaporation:
     K = 1.25e-3  # m/s
     R = 8.314  # J / (mol * K)
-    T_b = 100  # K
     rho_w = 1000  # kg/m^3
     rho_o = 880  # kg/m^3
 
@@ -58,7 +57,7 @@ class Evaporation:
 
         for particle in new_cell.particles:
             if particle.mass - mass_change > 0:
-                particle.mass -= mass_change / 2
+                particle.mass -= mass_change
             else:
                 particle.mass = 0
 
